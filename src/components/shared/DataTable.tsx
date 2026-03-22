@@ -1,3 +1,4 @@
+import { AlertCircle } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 interface Column<T> {
@@ -11,9 +12,10 @@ interface DataTableProps<T> {
   data: T[];
   onRowClick?: (row: T) => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
-export function DataTable<T>({ columns, data, onRowClick, isLoading }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, onRowClick, isLoading, error }: DataTableProps<T>) {
   if (isLoading) {
     return (
       <div className="w-full flex justify-center py-10">
@@ -41,7 +43,16 @@ export function DataTable<T>({ columns, data, onRowClick, isLoading }: DataTable
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {data.length > 0 ? (
+          {error ? (
+            <tr>
+              <td colSpan={columns.length} className="px-6 py-10 text-center text-sm">
+                <div className="flex flex-col items-center justify-center gap-2 text-red-500 font-medium">
+                  <AlertCircle className="w-8 h-8" />
+                  <p>{error}</p>
+                </div>
+              </td>
+            </tr>
+          ) : data.length > 0 ? (
             data.map((row, rowIdx) => (
               <tr
                 key={rowIdx}

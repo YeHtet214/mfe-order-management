@@ -1,9 +1,7 @@
 import {
   LayoutDashboard,
-  Users,
-  ShieldCheck,
-  Lock,
-  AppWindow,
+  ShoppingBag,
+  Tag,
   History,
   User,
   X,
@@ -14,10 +12,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: Users, label: "Users", path: "/users", permission: "users.view" },
-  { icon: ShieldCheck, label: "Roles", path: "/roles", permission: "roles.view" },
-  { icon: Lock, label: "Permissions", path: "/permissions", permission: "portal.access" },
-  { icon: AppWindow, label: "App Access", path: "/app-access", permission: "portal.access" },
+  { icon: ShoppingBag, label: "Products", path: "/products" },
   { icon: History, label: "Audit Logs", path: "/audit-logs", permission: "portal.access" },
   { icon: User, label: "Profile", path: "/profile" },
 ];

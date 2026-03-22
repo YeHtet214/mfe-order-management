@@ -1,9 +1,10 @@
 import { ShieldAlert, ArrowLeft, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { authURL } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 export function UnauthorizedPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
@@ -27,7 +28,7 @@ export function UnauthorizedPage() {
             Go Back
           </button>
           <button
-            onClick={() => navigate(`${authURL}?redirect=${encodeURIComponent(window.location.href)}`)}
+            onClick={() => login()}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
           >
             <LogIn className="w-4 h-4" />

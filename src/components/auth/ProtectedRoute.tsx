@@ -8,13 +8,11 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-	const { isAuthenticated, isLoading, login } = useAuth();
+	const { isAuthenticated, isLoading } = useAuth();
 
-	useEffect(() => {
-		if (!isLoading && !isAuthenticated) {
-			login();
-		}
-	}, [isLoading, isAuthenticated, login]);
+	if (!isLoading && !isAuthenticated) {
+		return <UnauthorizedPage />;
+	}
 
 	if (isLoading) {
 		return (
