@@ -19,14 +19,6 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div className="hidden md:flex items-center relative max-w-md w-64">
-          <Search className="absolute left-3 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="pl-10 pr-4 py-1.5 w-full bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">

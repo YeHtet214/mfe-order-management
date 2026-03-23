@@ -8,6 +8,7 @@ import { ProductCreatePage } from "./pages/products/ProductCreatePage";
 import { ProductEditPage } from "./pages/products/ProductEditPage";
 import { ProductDetailPage } from "./pages/products/ProductDetailPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
 
 function App() {
   return (
@@ -24,11 +25,12 @@ function App() {
             <Route path="/products/create" element={<ProductCreatePage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/products/:id/edit" element={<ProductEditPage />} />
-            <Route path="/dashboard" element={<Navigate to="/products" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/products" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

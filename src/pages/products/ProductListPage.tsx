@@ -93,7 +93,7 @@ export function ProductListPage() {
 					hasPermission("products.create") && (
 						<Link
 							to="/products/create"
-							className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition-all"
+							className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 !text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition-all"
 						>
 							<Plus className="w-4 h-4" />
 							Create Product

@@ -50,7 +50,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">
                 P
               </div>
-              <span className="font-bold text-lg tracking-tight text-white">Portal Admin</span>
+              <span className="font-bold text-lg tracking-tight text-white">Proudct</span>
             </div>
             <button
               onClick={onClose}
