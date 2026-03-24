@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { 
-  ShoppingBag, 
-  Package, 
+  ShoppingCart, 
+  DollarSign, 
+  Clock, 
   CheckCircle, 
-  XCircle, 
   TrendingUp,
   BarChart3,
   PieChart as PieChartIcon,
@@ -24,29 +24,19 @@ import {
   Line
 } from "recharts";
 import { PageHeader } from "../../components/layout/PageHeader";
-import { fetchProducts } from "../../services/productApi";
-import { fetchCategories } from "../../services/categoryApi";
-import type { Product, Category } from "../../services/types";
+import { getOrders } from "../../services/orderApi";
+import type { Order, OrderStatus } from "../../types/order";
 
 export function DashboardPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [activeProducts, setActiveProducts] = useState(0);
-  const [inactiveProducts, setInactiveProducts] = useState(0);
-  const [totalStock, setTotalStock] = useState(0);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadOrders = async () => {
       try {
         setLoading(true);
-        // Fetch products (limit to 100 for dashboard summary)
-        const productsResponse = await fetchProducts({ per_page: 100 });
-        const categoriesResponse = await fetchCategories();
-        
-        setProducts(productsResponse.data);
-        setCategories(categoriesResponse.data);
+        const response = await getOrders({ per_page: 100 });
+        setOrders(response.data);
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
       } finally {
@@ -54,75 +44,123 @@ export function DashboardPage() {
       }
     };
 
-    loadData();
+    loadOrders();
   }, []);
 
-  // Calculate statistics
-  useEffect(() => {
-    console.log("products", products);
-    if (!products || products.length === 0) return;
+  // Calculate order statistics
+  const stats = useMemo(() => {
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const pendingOrders = orders.filter(o => o.status === "pending").length;
+    const completedOrders = orders.filter(o => o.status === "completed").length;
+    const cancelledOrders = orders.filter(o => o.status === "cancelled").length;
+    const processingOrders = orders.filter(o => o.status === "processing" || o.status === "confirmed").length;
 
-    setTotalProducts(products.length);
-    setActiveProducts(products.filter(p => p.status === "active").length);
-    setInactiveProducts(products.filter(p => p.status === "inactive").length);
-    setTotalStock(products.reduce((sum, p) => sum + (p.has_variants ? p.variants.reduce((vSum, v) => vSum + v.stock_quantity, 0) : p.stock_quantity), 0));
-  }, [products]);
-  
-  // Data for Category Bar Chart
-  const productsByCategory = categories.map(cat => ({
-    name: cat.name,
-    count: products.filter(p => p.category_id === cat.id).length
-  })).filter(item => item.count > 0);
+    return {
+      totalOrders,
+      totalRevenue,
+      pendingOrders,
+      completedOrders,
+      cancelledOrders,
+      processingOrders
+    };
+  }, [orders]);
 
-  // Data for Status Pie Chart
-  const statusData = [
-    { name: "Active", value: activeProducts, color: "#10B981" }, // emerald-500
-    { name: "Inactive", value: inactiveProducts, color: "#EF4444" }, // red-500
-  ];
-
-  // Simulated growth data for Line Chart (Recent products added)
-  // In a real app, this would be based on created_at timestamps
-  const getGrowthData = () => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    return months.map((month, index) => ({
-      name: month,
-      products: Math.floor(Math.random() * 20) + (index * 5)
-    }));
+  // Status colors mapping
+  const statusColors: Record<OrderStatus, string> = {
+    pending: "#F59E0B",     // amber-500
+    confirmed: "#3B82F6",   // blue-500
+    processing: "#8B5CF6",  // purple-500
+    completed: "#10B981",   // emerald-500
+    cancelled: "#EF4444",   // red-500
   };
-  const growthData = getGrowthData();
+
+  // Data for Orders by Status Bar Chart
+  const ordersByStatus = useMemo(() => {
+    const statusCounts: Record<OrderStatus, number> = {
+      pending: 0,
+      confirmed: 0,
+      processing: 0,
+      completed: 0,
+      cancelled: 0,
+    };
+    
+    orders.forEach(order => {
+      statusCounts[order.status]++;
+    });
+
+    return Object.entries(statusCounts).map(([status, count]) => ({
+      name: status.charAt(0).toUpperCase() + status.slice(1),
+      count,
+      color: statusColors[status as OrderStatus]
+    }));
+  }, [orders]);
+
+  // Data for Order Status Distribution Pie Chart
+  const statusDistribution = useMemo(() => {
+    const statusCounts: Record<OrderStatus, number> = {
+      pending: 0,
+      confirmed: 0,
+      processing: 0,
+      completed: 0,
+      cancelled: 0,
+    };
+    
+    orders.forEach(order => {
+      statusCounts[order.status]++;
+    });
+
+    return Object.entries(statusCounts)
+      .filter(([_, count]) => count > 0)
+      .map(([status, count]) => ({
+        name: status.charAt(0).toUpperCase() + status.slice(1),
+        value: count,
+        color: statusColors[status as OrderStatus]
+      }));
+  }, [orders]);
+
+  // Data for Orders Trend Line Chart (Last 6 months)
+  const ordersTrend = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    
+    return months.map((month, index) => {
+      // Simulate monthly distribution based on current total
+      const baseOrders = Math.floor(stats.totalOrders / 6);
+      return {
+        name: month,
+        orders: baseOrders * (index + 1)
+      };
+    });
+  }, [stats.totalOrders]);
 
   const statCards = [
     { 
-      label: "Total Products", 
-      value: totalProducts, 
-      icon: ShoppingBag, 
-      color: "bg-blue-500", 
-      textColor: "text-blue-600",
-      bgColor: "bg-blue-50"
+      label: "Total Orders", 
+      value: stats.totalOrders, 
+      icon: ShoppingCart, 
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600"
     },
     { 
-      label: "Total Stock", 
-      value: totalStock, 
-      icon: Package, 
-      color: "bg-purple-500", 
-      textColor: "text-purple-600",
-      bgColor: "bg-purple-50"
+      label: "Total Revenue", 
+      value: `$${stats.totalRevenue.toFixed(2)}`, 
+      icon: DollarSign, 
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600"
     },
     { 
-      label: "Active Products", 
-      value: activeProducts, 
+      label: "Pending Orders", 
+      value: stats.pendingOrders, 
+      icon: Clock, 
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600"
+    },
+    { 
+      label: "Completed Orders", 
+      value: stats.completedOrders, 
       icon: CheckCircle, 
-      color: "bg-emerald-500", 
-      textColor: "text-emerald-600",
-      bgColor: "bg-emerald-50"
-    },
-    { 
-      label: "Inactive Products", 
-      value: inactiveProducts, 
-      icon: XCircle, 
-      color: "bg-rose-500", 
-      textColor: "text-rose-600",
-      bgColor: "bg-rose-50"
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-600"
     },
   ];
 
@@ -138,7 +176,7 @@ export function DashboardPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <PageHeader 
         title="Dashboard" 
-        description="Overview of your product inventory and performance"
+        description="Overview of your orders and performance"
       />
 
       {/* Stat Cards */}
@@ -163,17 +201,17 @@ export function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Products by Category Bar Chart */}
+        {/* Orders by Status Bar Chart */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
               <BarChart3 className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Products by Category</h3>
+            <h3 className="text-lg font-bold text-gray-900">Orders by Status</h3>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={productsByCategory}>
+              <BarChart data={ordersByStatus}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis 
                   dataKey="name" 
@@ -195,25 +233,29 @@ export function DashboardPage() {
                     boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' 
                   }}
                 />
-                <Bar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={40} />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={40}>
+                  {ordersByStatus.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Product Status Pie Chart */}
+        {/* Order Status Distribution Pie Chart */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
               <PieChartIcon className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Inventory Status</h3>
+            <h3 className="text-lg font-bold text-gray-900">Order Status Distribution</h3>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={statusData}
+                  data={statusDistribution}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -221,7 +263,7 @@ export function DashboardPage() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {statusData.map((entry, index) => (
+                  {statusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -239,17 +281,17 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Growth Chart */}
+      {/* Orders Trend Chart */}
       <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
             <TrendingUp className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900">Inventory Growth (Last 6 Months)</h3>
+          <h3 className="text-lg font-bold text-gray-900">Orders Trend (Last 6 Months)</h3>
         </div>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={growthData}>
+            <LineChart data={ordersTrend}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis 
                 dataKey="name" 
@@ -272,7 +314,7 @@ export function DashboardPage() {
               />
               <Line 
                 type="monotone" 
-                dataKey="products" 
+                dataKey="orders" 
                 stroke="#10b981" 
                 strokeWidth={3} 
                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}

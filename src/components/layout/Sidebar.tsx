@@ -12,7 +12,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: ShoppingBag, label: "Products", path: "/products" },
+  { icon: ShoppingBag, label: "Orders", path: "/orders" },
   { icon: History, label: "Audit Logs", path: "/audit-logs", permission: "portal.access" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
@@ -48,9 +48,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 shrink-0">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                P
+                O
               </div>
-              <span className="font-bold text-lg tracking-tight text-white">Proudct</span>
+              <span className="font-bold text-lg tracking-tight text-white">Ordering</span>
             </div>
             <button
               onClick={onClose}

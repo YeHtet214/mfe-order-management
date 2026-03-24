@@ -1,40 +1,39 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { MainLayout } from "./layouts/MainLayout/MainLayout";
-import { UnauthorizedPage } from "./pages/auth/UnauthorizedPage";
-import { ProductListPage } from "./pages/products/ProductListPage";
-import { ProductCreatePage } from "./pages/products/ProductCreatePage";
-import { ProductEditPage } from "./pages/products/ProductEditPage";
-import { ProductDetailPage } from "./pages/products/ProductDetailPage";
-import { ProfilePage } from "./pages/profile/ProfilePage";
-import { DashboardPage } from "./pages/dashboard/DashboardPage";
 
-function App() {
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { MainLayout } from './layouts/MainLayout/MainLayout';
+import { UnauthorizedPage } from './pages/auth/UnauthorizedPage';
+import OrderListPage from './pages/orders/OrderListPage';
+import OrderDetailPage from './pages/orders/OrderDetailPage';
+import OrderCreatePage from './pages/orders/OrderCreatePage';
+import OrderEditPage from './pages/orders/OrderEditPage';
+import { ProfilePage } from './pages/profile/ProfilePage';
+import { DashboardPage } from './pages/dashboard/DashboardPage';
+
+const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          {/* Auth Routes */}
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          
-          {/* Main App Routes - Protected */}
+
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-          <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/products" element={<ProductListPage />} />
-            <Route path="/products/create" element={<ProductCreatePage />} />
-            <Route path="/products/:id" element={<ProductDetailPage />} />
-            <Route path="/products/:id/edit" element={<ProductEditPage />} />
+            <Route path="/orders" element={<OrderListPage />} />
+            <Route path="/orders/create" element={<OrderCreatePage />} />
+            <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/orders/:id/edit" element={<OrderEditPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/orders" replace />} />
           </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/orders" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
-}
+};
 
 export default App;

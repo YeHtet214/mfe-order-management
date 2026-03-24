@@ -5,9 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: 'product.laravel-api-for-microfrontend.test',
-    port: 5175,
+    host: 'order.laravel-api-for-microfrontend.test',
+    port: 5176,
     strictPort: true,
-    allowedHosts: ['product.laravel-api-for-microfrontend.test', 'auth.laravel-api-for-microfrontend.test', 'user.laravel-api-for-microfrontend.test'],
+    allowedHosts: ['order.laravel-api-for-microfrontend.test', 'product.laravel-api-for-microfrontend.test', 'auth.laravel-api-for-microfrontend.test', 'user.laravel-api-for-microfrontend.test'],
   }
 })
