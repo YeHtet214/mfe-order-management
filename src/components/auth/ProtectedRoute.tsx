@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { UnauthorizedPage } from "../../pages/auth/UnauthorizedPage";
 

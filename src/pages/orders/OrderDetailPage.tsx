@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Edit2, RefreshCw } from 'lucide-react';
 import { useOrder } from '../../hooks/useOrder';
 import { updateOrderStatus } from '../../services/orderApi';
@@ -21,7 +21,6 @@ const ORDER_STATUSES: { value: OrderStatus; label: string }[] = [
 
 const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { order, loading, error, refetch } = useOrder(Number(id));
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | ''>('');
