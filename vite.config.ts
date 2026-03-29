@@ -10,9 +10,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    host: 'order.laravel-api-for-microfrontend.test',
+    host: 'order.mfe-server.test',
     port: 5176,
     strictPort: true,
-    allowedHosts: ['order.laravel-api-for-microfrontend.test', 'product.laravel-api-for-microfrontend.test', 'auth.laravel-api-for-microfrontend.test', 'user.laravel-api-for-microfrontend.test'],
+    allowedHosts: ['order.mfe-server.test', 'product.mfe-server.test', 'auth.mfe-server.test', 'user.mfe-server.test'],
   }
 })
