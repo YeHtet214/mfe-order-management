@@ -5,10 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: './',
   plugins: [react()],
-  build: {
-    outDir: 'build',
-    emptyOutDir: true,
-  },
   server: {
     host: 'order.mfe-server.test',
     port: 5176,
